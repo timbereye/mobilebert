@@ -747,8 +747,8 @@ def input_fn_builder(input_files,
       # even more randomness to the training pipeline.
       d = d.interleave(
           tf.data.TFRecordDataset,
-          num_parallel_calls=cycle_length,
-          deterministic=(not is_training))
+          num_parallel_calls=cycle_length,)
+          # deterministic=(not is_training))
       d = d.shuffle(buffer_size=100)
     else:
       d = tf.data.TFRecordDataset(input_files)
