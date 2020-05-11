@@ -26,7 +26,7 @@ flags.DEFINE_string("tpu_address", None, "tpu address")
 
 
 def export(checkpoint, export_path, tpu_address):
-    output_ckpt = os.path.join(export_path, "model.ckpt-best")
+    output_ckpt = os.path.join(export_path, "model.ckpt")
     tf.reset_default_graph()
     clear_devices = True
     saver = tf.train.import_meta_graph(checkpoint + '.meta', clear_devices=clear_devices)
@@ -34,11 +34,11 @@ def export(checkpoint, export_path, tpu_address):
         saver.restore(sess, checkpoint)
         my_vars = []
         for var in tf.global_variables():
-            print(var.name)
-            # if "adam_v" not in var.name and "adam_m" not in var.name:
-            #     my_vars.append(var)
-        # new_saver = tf.train.Saver(my_vars)
-        # new_saver.save(sess, output_ckpt)
+            if "adam_v" in var.name or "adam_m" in var.name or var.name.startswith("teacher"):
+                continue
+            my_vars.append(var)
+        new_saver = tf.train.Saver(my_vars)
+        new_saver.save(sess, output_ckpt)
 
 
 if __name__ == '__main__':
